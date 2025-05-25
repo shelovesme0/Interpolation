@@ -381,6 +381,27 @@ namespace CourseWorkRealease
                             return;
                         }
 
+                        string[] xParts = xStr.Split('.');
+                        if (xParts.Length > 1 && xParts[1].Length > 6)
+                        {
+                            MessageBox.Show($"X value at row {i + 1} has more than 6 decimal places and will be rounded to 6.", "Rounding Warning");
+                            if (double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double xTemp))
+                            {
+                                xStr = Math.Round(xTemp, 6, MidpointRounding.ToEven).ToString("F6", CultureInfo.InvariantCulture);
+                            }
+                        }
+
+                        // Перевірка кількості цифр після коми для Y
+                        string[] yParts = yStr.Split('.');
+                        if (yParts.Length > 1 && yParts[1].Length > 6)
+                        {
+                            MessageBox.Show($"Y value at row {i + 1} has more than 6 decimal places and will be rounded to 6.", "Rounding Warning");
+                            if (double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double yTemp))
+                            {
+                                yStr = Math.Round(yTemp, 6, MidpointRounding.ToEven).ToString("F6", CultureInfo.InvariantCulture);
+                            }
+                        }
+
                         if (!double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double x) ||
                             !double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
                         {
