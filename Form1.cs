@@ -100,18 +100,9 @@ namespace CourseWorkRealease
             // Label for coordinates limit
             Label lblCoordinatesLimit = new Label
             {
-                Text = $"X, Y range: [{MinValue}, {MaxValue}]",
+                Text = $"X, Y range: [{MinValue}, {MaxValue}]\nAbsolute value must be >= {minAbsoluteValue} or 0\nMaximum 6 decimal places",
                 Location = new System.Drawing.Point(20, 250),
                 AutoSize = true,
-                ForeColor = Color.DarkGray
-            };
-
-            // Label for minimum absolute value
-            Label lblMinAbsoluteValue = new Label
-            {
-                Text = $"Absolute value must be >= {minAbsoluteValue} or 0",
-                Location = new System.Drawing.Point(20, 270),
-                Size = new System.Drawing.Size(200, 20),
                 ForeColor = Color.DarkGray
             };
 
@@ -255,7 +246,7 @@ namespace CourseWorkRealease
             // Add controls to form
             this.Controls.AddRange(new Control[] {
                 lblPoints, txtNumberOfPoints, lblPointsLimit, btnSetPoints,
-                dgvPoints, lblCoordinatesLimit, lblMinAbsoluteValue, lblXValue, txtXValue,
+                dgvPoints, lblCoordinatesLimit, lblXValue, txtXValue,
                 grpMethod, btnCalculate, btnSaveToFile,
                 lblInterpolationValue, txtInterpolationValue,
                 lblIterations, txtIterations,
@@ -375,6 +366,7 @@ namespace CourseWorkRealease
                             MessageBox.Show($"X value at row {i + 1} cannot start with zero (e.g., 001).", "Invalid input");
                             return;
                         }
+
                         if (yStr.Length > 1 && yStr[0] == '0' && !yStr.StartsWith("0."))
                         {
                             MessageBox.Show($"Y value at row {i + 1} cannot start with zero (e.g., 001).", "Invalid input");
@@ -382,30 +374,28 @@ namespace CourseWorkRealease
                         }
 
                         string[] xParts = xStr.Split('.');
-                        if (xParts.Length > 1 && xParts[1].Length > 6)
+                        if (xParts.Length > 1 && xParts[1].Length > 6 && xParts[1][6] != '0')
                         {
-                            MessageBox.Show($"X value at row {i + 1} has more than 6 decimal places and will be rounded to 6.", "Rounding Warning");
-                            if (double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double xTemp))
-                            {
-                                xStr = Math.Round(xTemp, 6, MidpointRounding.ToEven).ToString("F6", CultureInfo.InvariantCulture);
-                            }
+                            MessageBox.Show($"X value at row {i + 1} can't have more than 6 decimal places.", "Invalid input");
+                            return;
                         }
 
-                        // Перевірка кількості цифр після коми для Y
                         string[] yParts = yStr.Split('.');
-                        if (yParts.Length > 1 && yParts[1].Length > 6)
+                        if (yParts.Length > 1 && yParts[1].Length > 6 && yParts[1][6] != '0')
                         {
-                            MessageBox.Show($"Y value at row {i + 1} has more than 6 decimal places and will be rounded to 6.", "Rounding Warning");
-                            if (double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double yTemp))
-                            {
-                                yStr = Math.Round(yTemp, 6, MidpointRounding.ToEven).ToString("F6", CultureInfo.InvariantCulture);
-                            }
+                            MessageBox.Show($"Y value at row {i + 1} can't have more than 6 decimal places.", "Invalid input");
+                            return;
                         }
 
-                        if (!double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double x) ||
-                            !double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
+                        if (!double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double x))
                         {
-                            MessageBox.Show($"Invalid coordinate format at row {i + 1}. Please enter valid numbers.", "Invalid input");
+                            MessageBox.Show($"X value is invalid format at row {i + 1}. Please enter valid numbers.", "Invalid input");
+                            return;
+                        }
+
+                        if (!double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
+                        {
+                            MessageBox.Show($"Y value is invalid format at row {i + 1}. Please enter valid numbers.", "Invalid input");
                             return;
                         }
 
@@ -450,7 +440,14 @@ namespace CourseWorkRealease
                         MessageBox.Show("Please enter a value for X interpolation.", "Invalid input");
                         return;
                     }
-                    //if (!double.TryParse(xValueInput, NumberStyles.Float, CultureInfo.InvariantCulture, out double xValue))
+
+                    string[] xInterpolationParts = xValueInput.Split('.');
+                    if (xInterpolationParts.Length > 1 && xInterpolationParts[1].Length > 6 && xInterpolationParts[1][6] != '0')
+                    {
+                        MessageBox.Show($"X value for interpolation can't have more than 6 decimal places.", "Invalid input");
+                        return;
+                    }
+
                     if (!double.TryParse(xValueInput, NumberStyles.Float, CultureInfo.InvariantCulture, out double xValue))
                     {
                         MessageBox.Show("Please enter a valid number for X interpolation.", "Invalid input");
