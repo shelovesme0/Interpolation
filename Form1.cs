@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Globalization;
@@ -82,7 +78,7 @@ namespace CourseWorkRealease
                 AllowUserToAddRows = false
             };
 
-            // Налаштування стовпців
+            // columns setup
             dgvPoints.Columns[0].HeaderText = "Set #";
             dgvPoints.Columns[0].Width = 50;
             dgvPoints.Columns[0].ReadOnly = true;
@@ -225,7 +221,7 @@ namespace CourseWorkRealease
             chart.Series["Function"].ChartType = SeriesChartType.Spline;
             chart.Series["Function"].BorderWidth = 2;
 
-            // Label for polynomial (під графіком)
+            // Label for polynomial
             Label lblPolynomial = new Label
             {
                 Text = "Interpolation Polynomial for Lagrange:",
@@ -233,7 +229,7 @@ namespace CourseWorkRealease
                 AutoSize = true
             };
 
-            // Textbox for polynomial (під графіком)
+            // Textbox for polynomial
             TextBox txtPolynomial = new TextBox
             {
                 Location = new System.Drawing.Point(300, 550),
@@ -244,7 +240,7 @@ namespace CourseWorkRealease
             };
 
             // Add controls to form
-            this.Controls.AddRange(new Control[] {
+            Controls.AddRange(new Control[] {
                 lblPoints, txtNumberOfPoints, lblPointsLimit, btnSetPoints,
                 dgvPoints, lblCoordinatesLimit, lblXValue, txtXValue,
                 grpMethod, btnCalculate, btnSaveToFile,
@@ -253,14 +249,14 @@ namespace CourseWorkRealease
                 chart, lblPolynomial, txtPolynomial, lblInterpolationValueLimit
             });
 
-            // Подія для відстеження змін у txtNumberOfPoints
+            // Event to track changes in txtNumberOfPoints
             txtNumberOfPoints.TextChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
             };
 
-            // Подія для відстеження змін у DataGridView
+            // Event to track changes in DataGridView
             dgvPoints.CellValueChanged += (s, e) =>
             {
                 if (e.ColumnIndex != 0)
@@ -270,14 +266,14 @@ namespace CourseWorkRealease
                 }
             };
 
-            // Подія для відстеження змін у txtXValue
+            // Event to track changes in txtXValue
             txtXValue.TextChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
             };
 
-            // Подія для відстеження зміни методу
+            // Event to track method selection changes
             rbLagrange.CheckedChanged += (s, e) =>
             {
                 isCalculated = false;
@@ -327,7 +323,7 @@ namespace CourseWorkRealease
             {
                 try
                 {
-                    // Перевірка txtNumberOfPoints
+                    // check txtNumberOfPoints
                     string pointsInput = txtNumberOfPoints.Text.Trim().Replace(',', '.');
                     if (pointsInput.Length > 1 && pointsInput[0] == '0')
                     {
@@ -340,7 +336,7 @@ namespace CourseWorkRealease
                         return;
                     }
 
-                    // Перевірка DataGridView
+                    // check DataGridView
                     if (dgvPoints.RowCount != n)
                     {
                         MessageBox.Show("Please set the points by clicking 'Set Points' first.", "Set points");
@@ -433,7 +429,7 @@ namespace CourseWorkRealease
                         points[i] = new Points(x, y);
                     }
 
-                    // Перевірка txtXValue
+                    // check txtXValue (X value for interpolation)
                     string xValueInput = txtXValue.Text.Trim().Replace(',', '.');
                     if (string.IsNullOrEmpty(xValueInput))
                     {
@@ -521,7 +517,7 @@ namespace CourseWorkRealease
                         for (int i = 0; i < plotPoints; i++)
                         {
                             double x = xMin + i * step;
-                            (double y, int temp) = rbLagrange.Checked
+                            (double y, _) = rbLagrange.Checked
                                 ? Interpolation.LagrangeInterpolation(points, x)
                                 : Interpolation.AitkenInterpolation(points, x);
                             chart.Series["Function"].Points.AddXY(x, y);
@@ -599,8 +595,6 @@ namespace CourseWorkRealease
 
         private string GetLagrangePolynomial(Points[] points)
         {
-            if (points == null || points.Length == 0) return "No points available.";
-
             StringBuilder polynomial = new StringBuilder();
             int n = points.Length;
 
@@ -608,7 +602,7 @@ namespace CourseWorkRealease
             {
                 double yi = points[i].Y;
                 polynomial.Append(yi >= 0 ? " + " : " - ");
-                polynomial.Append(Math.Abs(yi).ToString("F2"));
+                polynomial.Append(Math.Abs(yi));
 
                 for (int j = 0; j < n; j++)
                 {
@@ -628,7 +622,6 @@ namespace CourseWorkRealease
             }
 
             string result = polynomial.ToString().TrimStart('+', ' ').TrimStart('-', ' ');
-            if (string.IsNullOrEmpty(result)) result = "0";
             return result;
         }
 
