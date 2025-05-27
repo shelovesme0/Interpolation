@@ -13,12 +13,17 @@ namespace CourseWorkRealease
     public partial class Form1 : Form
     {
         private bool isCalculated = false;
+        private Points[] validatedPoints;
+        private double? validatedXValue;
+        private TextBox txtInterpolationValue;
+        private TextBox txtIterations;
+        private TextBox txtPolynomial;
         private const int MaxPoints = 30;
         private const int MinPoints = 2;
         private const double MinValue = -1e6;
         private const double MaxValue = 1e6;
         private const double minAbsoluteValue = 1e-5;
-        private const double MinInterpolationResult= -1e5;
+        private const double MinInterpolationResult = -1e5;
         private const double MaxInterpolationResult = 1e5;
 
         public Form1()
@@ -30,7 +35,7 @@ namespace CourseWorkRealease
         {
             // Form setup
             Text = "Interpolation Calculator";
-            Size = new System.Drawing.Size(1000, 700);
+            Size = new Size(1000, 700);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
 
@@ -38,15 +43,15 @@ namespace CourseWorkRealease
             Label lblPoints = new Label
             {
                 Text = "Number of Points:",
-                Location = new System.Drawing.Point(20, 20),
-                Size = new System.Drawing.Size(100, 20)
+                Location = new Point(20, 20),
+                Size = new Size(100, 20)
             };
 
             // Points input textbox
             TextBox txtNumberOfPoints = new TextBox
             {
-                Location = new System.Drawing.Point(120, 20),
-                Size = new System.Drawing.Size(60, 20),
+                Location = new Point(120, 20),
+                Size = new Size(60, 20),
                 Name = "txtNumberOfPoints"
             };
 
@@ -54,7 +59,7 @@ namespace CourseWorkRealease
             Label lblPointsLimit = new Label
             {
                 Text = $"({MinPoints} to {MaxPoints} points)",
-                Location = new System.Drawing.Point(112, 40),
+                Location = new Point(112, 40),
                 AutoSize = true,
                 ForeColor = Color.DarkGray
             };
@@ -63,16 +68,16 @@ namespace CourseWorkRealease
             Button btnSetPoints = new Button
             {
                 Text = "Set Points",
-                Location = new System.Drawing.Point(190, 18),
-                Size = new System.Drawing.Size(80, 25),
+                Location = new Point(190, 18),
+                Size = new Size(80, 25),
                 Name = "btnSetPoints"
             };
 
             // DataGridView for points
             DataGridView dgvPoints = new DataGridView
             {
-                Location = new System.Drawing.Point(20, 70),
-                Size = new System.Drawing.Size(243, 180),
+                Location = new Point(20, 70),
+                Size = new Size(243, 180),
                 Name = "dgvPoints",
                 ColumnCount = 3,
                 AllowUserToAddRows = false
@@ -97,7 +102,7 @@ namespace CourseWorkRealease
             Label lblCoordinatesLimit = new Label
             {
                 Text = $"X, Y range: [{MinValue}, {MaxValue}]\nAbsolute value must be >= {minAbsoluteValue} or 0\nMaximum 6 decimal places",
-                Location = new System.Drawing.Point(20, 250),
+                Location = new Point(20, 250),
                 AutoSize = true,
                 ForeColor = Color.DarkGray
             };
@@ -106,21 +111,21 @@ namespace CourseWorkRealease
             Label lblXValue = new Label
             {
                 Text = "X Value for Interpolation:",
-                Location = new System.Drawing.Point(20, 300),
+                Location = new Point(20, 300),
                 AutoSize = true
             };
 
             TextBox txtXValue = new TextBox
             {
-                Location = new System.Drawing.Point(150, 300),
-                Size = new System.Drawing.Size(60, 20),
+                Location = new Point(150, 300),
+                Size = new Size(60, 20),
                 Name = "txtXValue"
             };
 
             Label lblInterpolationValueLimit = new Label
             {
                 Text = $"X interpolation range: [{MinValue}, {MaxValue}]\nY interpolation range: [{MinInterpolationResult}, {MaxInterpolationResult}]\n",
-                Location = new System.Drawing.Point(20, 330),
+                Location = new Point(20, 330),
                 AutoSize = true,
                 ForeColor = Color.DarkGray
             };
@@ -129,15 +134,15 @@ namespace CourseWorkRealease
             GroupBox grpMethod = new GroupBox
             {
                 Text = "Interpolation Method",
-                Location = new System.Drawing.Point(20, 370),
-                Size = new System.Drawing.Size(200, 80)
+                Location = new Point(20, 370),
+                Size = new Size(200, 80)
             };
 
             RadioButton rbLagrange = new RadioButton
             {
                 Text = "Lagrange",
-                Location = new System.Drawing.Point(10, 20),
-                Size = new System.Drawing.Size(80, 20),
+                Location = new Point(10, 20),
+                Size = new Size(80, 20),
                 Checked = true,
                 Name = "rbLagrange"
             };
@@ -145,8 +150,8 @@ namespace CourseWorkRealease
             RadioButton rbAitken = new RadioButton
             {
                 Text = "Aitken",
-                Location = new System.Drawing.Point(10, 40),
-                Size = new System.Drawing.Size(80, 20),
+                Location = new Point(10, 40),
+                Size = new Size(80, 20),
                 Name = "rbAitken"
             };
 
@@ -154,8 +159,8 @@ namespace CourseWorkRealease
             Button btnCalculate = new Button
             {
                 Text = "Calculate",
-                Location = new System.Drawing.Point(20, 460),
-                Size = new System.Drawing.Size(80, 25),
+                Location = new Point(20, 460),
+                Size = new Size(80, 25),
                 Name = "btnCalculate"
             };
 
@@ -163,8 +168,8 @@ namespace CourseWorkRealease
             Button btnSaveToFile = new Button
             {
                 Text = "Save to File",
-                Location = new System.Drawing.Point(110, 460),
-                Size = new System.Drawing.Size(100, 25),
+                Location = new Point(110, 460),
+                Size = new Size(100, 25),
                 Name = "btnSaveToFile",
                 Enabled = false
             };
@@ -173,15 +178,15 @@ namespace CourseWorkRealease
             Label lblInterpolationValue = new Label
             {
                 Text = "Interpolated Value:",
-                Location = new System.Drawing.Point(20, 500),
+                Location = new Point(20, 500),
                 AutoSize = true
             };
 
             // Textbox for interpolation value
-            TextBox txtInterpolationValue = new TextBox
+            txtInterpolationValue = new TextBox
             {
-                Location = new System.Drawing.Point(20, 520),
-                Size = new System.Drawing.Size(200, 20),
+                Location = new Point(20, 520),
+                Size = new Size(200, 20),
                 ReadOnly = true,
                 Name = "txtInterpolationValue"
             };
@@ -190,15 +195,15 @@ namespace CourseWorkRealease
             Label lblIterations = new Label
             {
                 Text = "Iterations:",
-                Location = new System.Drawing.Point(20, 550),
+                Location = new Point(20, 550),
                 AutoSize = true
             };
 
             // Textbox for iterations
-            TextBox txtIterations = new TextBox
+            txtIterations = new TextBox
             {
-                Location = new System.Drawing.Point(20, 570),
-                Size = new System.Drawing.Size(200, 20),
+                Location = new Point(20, 570),
+                Size = new Size(200, 20),
                 ReadOnly = true,
                 Name = "txtIterations"
             };
@@ -206,8 +211,8 @@ namespace CourseWorkRealease
             // Chart for plotting
             Chart chart = new Chart
             {
-                Location = new System.Drawing.Point(300, 20),
-                Size = new System.Drawing.Size(640, 500),
+                Location = new Point(300, 20),
+                Size = new Size(640, 500),
                 Name = "chartInterpolation"
             };
 
@@ -225,15 +230,15 @@ namespace CourseWorkRealease
             Label lblPolynomial = new Label
             {
                 Text = "Interpolation Polynomial for Lagrange:",
-                Location = new System.Drawing.Point(300, 530),
+                Location = new Point(300, 530),
                 AutoSize = true
             };
 
             // Textbox for polynomial
-            TextBox txtPolynomial = new TextBox
+            txtPolynomial = new TextBox
             {
-                Location = new System.Drawing.Point(300, 550),
-                Size = new System.Drawing.Size(640, 60),
+                Location = new Point(300, 550),
+                Size = new Size(640, 60),
                 Multiline = true,
                 ReadOnly = true,
                 Name = "txtPolynomial"
@@ -249,46 +254,52 @@ namespace CourseWorkRealease
                 chart, lblPolynomial, txtPolynomial, lblInterpolationValueLimit
             });
 
-            // Event to track changes in txtNumberOfPoints
+            // Event handlers
             txtNumberOfPoints.TextChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
+                validatedPoints = null;
+                validatedXValue = null;
             };
 
-            // Event to track changes in DataGridView
             dgvPoints.CellValueChanged += (s, e) =>
             {
                 if (e.ColumnIndex != 0)
                 {
                     isCalculated = false;
                     btnSaveToFile.Enabled = false;
+                    validatedPoints = null;
+                    validatedXValue = null;
                 }
             };
 
-            // Event to track changes in txtXValue
             txtXValue.TextChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
+                validatedPoints = null;
+                validatedXValue = null;
             };
 
-            // Event to track method selection changes
             rbLagrange.CheckedChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
+                validatedPoints = null;
+                validatedXValue = null;
             };
 
             rbAitken.CheckedChanged += (s, e) =>
             {
                 isCalculated = false;
                 btnSaveToFile.Enabled = false;
+                validatedPoints = null;
+                validatedXValue = null;
             };
 
             grpMethod.Controls.AddRange(new Control[] { rbLagrange, rbAitken });
 
-            //Event handlers
             btnSetPoints.Click += (s, e) =>
             {
                 string input = txtNumberOfPoints.Text.Trim().Replace(',', '.');
@@ -308,6 +319,8 @@ namespace CourseWorkRealease
 
                     isCalculated = false;
                     btnSaveToFile.Enabled = false;
+                    validatedPoints = null;
+                    validatedXValue = null;
                 }
                 else if (!int.TryParse(input, out n))
                 {
@@ -429,7 +442,10 @@ namespace CourseWorkRealease
                         points[i] = new Points(x, y);
                     }
 
-                    // check txtXValue (X value for interpolation)
+                    // Save validated points
+                    validatedPoints = points;
+
+                    // check txtXValue
                     string xValueInput = txtXValue.Text.Trim().Replace(',', '.');
                     if (string.IsNullOrEmpty(xValueInput))
                     {
@@ -462,7 +478,10 @@ namespace CourseWorkRealease
                         return;
                     }
 
-                    // Perform interpolation
+                    // Save validated X value
+                    validatedXValue = xValue;
+
+                    // Run interpolation
                     double result = 0;
                     int iterations = 0;
 
@@ -475,12 +494,10 @@ namespace CourseWorkRealease
                         (result, iterations) = Interpolation.AitkenInterpolation(points, xValue);
                     }
 
-
-
                     txtInterpolationValue.Text = $"{result}";
                     txtIterations.Text = $"{iterations}";
 
-                    // Calculate and display polynomial
+                    // Lagrange polynomial calculation
                     if (rbLagrange.Checked)
                     {
                         string polynomial = GetLagrangePolynomial(points);
@@ -491,7 +508,7 @@ namespace CourseWorkRealease
                         txtPolynomial.Text = "Polynomial not available for Aitken method.";
                     }
 
-                    // Plot the graph
+                    // Chart plotting
                     chart.Series["Points"].Points.Clear();
                     chart.Series["Function"].Points.Clear();
 
@@ -538,36 +555,15 @@ namespace CourseWorkRealease
                     MessageBox.Show($"Error: {ex.Message}");
                     isCalculated = false;
                     btnSaveToFile.Enabled = false;
+                    validatedPoints = null;
+                    validatedXValue = null;
                 }
             };
 
-            // Event handler for Save to File button
             btnSaveToFile.Click += (s, e) =>
             {
                 try
                 {
-                    if (!isCalculated)
-                    {
-                        MessageBox.Show("Please calculate the interpolation first.", "Calculate first");
-                        return;
-                    }
-
-                    Points[] points = new Points[dgvPoints.RowCount];
-                    for (int i = 0; i < dgvPoints.RowCount; i++)
-                    {
-                        string xStr = dgvPoints.Rows[i].Cells[1].Value.ToString().Trim().Replace(',', '.');
-                        string yStr = dgvPoints.Rows[i].Cells[2].Value.ToString().Trim().Replace(',', '.');
-
-                        if (!double.TryParse(xStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double x) ||
-                            !double.TryParse(yStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double y))
-                        {
-                            MessageBox.Show($"Invalid coordinate format at row {i + 1}. Please enter valid numbers.", "Invalid input");
-                            return;
-                        }
-
-                        points[i] = new Points(x, y);
-                    }
-
                     string interpolationResult = txtInterpolationValue.Text;
                     string iterations = txtIterations.Text;
                     string polynomial = txtPolynomial.Text;
@@ -581,7 +577,7 @@ namespace CourseWorkRealease
 
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
-                            SaveResultsInFile(points, interpolationResult, iterations, polynomial, saveFileDialog.FileName);
+                            SaveResultsInFile(validatedPoints, interpolationResult, iterations, polynomial, saveFileDialog.FileName);
                             MessageBox.Show($"Results saved to {saveFileDialog.FileName}");
                         }
                     }
